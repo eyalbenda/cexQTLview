@@ -33,17 +33,13 @@ ui <- fluidPage(
       uiOutput("generations"),
       uiOutput("chromosome"),
       uiOutput("positions"),
+      uiOutput("ycoord"),
       actionButton("draw", "Draw plot")
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
-      plotOutput("distPlot",
-                 
-                 brush = brushOpts(
-                   id = "distPlot_brush",
-                   resetOnNew = TRUE
-                 )) %>% withSpinner()
+      plotOutput("distPlot") %>% withSpinner()
     )
   )
 )
@@ -78,7 +74,10 @@ server <- function(input, output) {
     sliderInput("pos", label = h3("Slider Range"), min = 0, 
                 max = max(dfAllFreqs$pos_N2[dfAllFreqs$exp==input$exp & dfAllFreqs$chrom %in% input$chrom]), value = c(1, 19997000))
   })
-  # observeEvent( input$draw, {
+  output$ycoord <- renderUI({
+    sliderInput("yrange", label = h3("y axis range"), min = -0.5, 
+                max = 0.5, value = c(-0.5, 0.5))
+  })
   output$distPlot <- renderPlot({
     req(input$draw)
     req(isolate(input$gens))
@@ -90,22 +89,10 @@ server <- function(input, output) {
       scale_color_viridis(name="generation",discrete=T,begin = 1,end=0) + 
       ylab("\u2190 CB4856               N2     \u2192") + xlab("Physical Position (mb)") + theme(plot.background = element_blank()) +
       geom_hline(yintercept=0,linetype=3) +
-      facet_grid(exp~chrom,scales = "free",space="free_x") + scale_y_continuous(limits=c(-0.5,0.5)) +
+      facet_grid(exp~chrom,scales = "free",space="free_x") + scale_y_continuous(limits=c(isolate(input$yrange[1]),isolate(input$yrange[2]))) +
       scale_x_continuous(labels = function(x)sub("^0kb","0",ifelse(x<1e5,paste(x/1e3,"kb",sep=""),paste(x/1e6,"mb",sep="")))) +  
       theme(axis.text.x = element_text(angle = 45, hjust = 1),legend.background = element_blank(),legend.position="bottom",legend.direction = "horizontal")
   })
-  observeEvent(input$zoom, {
-    brush <- input$distPlot_brush
-    if (!is.null(brush)) {
-      ranges$x <- c(brush$xmin, brush$xmax)
-      ranges$y <- c(brush$ymin, brush$ymax)
-      
-    } else {
-      ranges$x <- NULL
-      ranges$y <- NULL
-    }
-  })
-  # })
 }
 
 # Run the application 
