@@ -71,11 +71,11 @@ server <- function(input, output) {
     )
   })
   output$positions <- renderUI({
-    sliderInput("pos", label = h3("Slider Range"), min = 0, 
+    sliderInput("pos", label = h3("x limits"), min = 0, 
                 max = max(dfAllFreqs$pos_N2[dfAllFreqs$exp==input$exp & dfAllFreqs$chrom %in% input$chrom]), value = c(1, 19997000))
   })
   output$ycoord <- renderUI({
-    sliderInput("yrange", label = h3("y Axis Range"), min = -0.5, 
+    sliderInput("yrange", label = h3("y limits"), min = -0.5, 
                 max = 0.5, value = c(-0.5, 0.5))
   })
   output$distPlot <- renderPlot({
