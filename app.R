@@ -75,14 +75,14 @@ server <- function(input, output) {
                 max = max(dfAllFreqs$pos_N2[dfAllFreqs$exp==input$exp & dfAllFreqs$chrom %in% input$chrom]), value = c(1, 19997000))
   })
   output$ycoord <- renderUI({
-    sliderInput("yrange", label = h3("y axis range"), min = -0.5, 
+    sliderInput("yrange", label = h3("y Axis Range"), min = -0.5, 
                 max = 0.5, value = c(-0.5, 0.5))
   })
   output$distPlot <- renderPlot({
     req(input$draw)
     req(isolate(input$gens))
     # generate bins based on input$bins from ui.R
-    curDF = dfAllFreqs %>% filter(dfAllFreqs$exp==input$exp&dfAllFreqs$generation %in% isolate(input$gens))
+    curDF = dfAllFreqs %>% filter(dfAllFreqs$exp==isolate(input$exp)&dfAllFreqs$generation %in% isolate(input$gens))
     curDF = curDF %>% filter(pos_N2>isolate(input$pos)[1]&pos_N2<isolate(input$pos)[2] & curDF$chrom %in% isolate(input$chrom))
     ggplot(curDF,aes(x=pos_N2,y=value,color=as.factor(generation),group=generation)) + 
       theme_base() +  geom_line() + 
